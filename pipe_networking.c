@@ -15,18 +15,14 @@
 int server_handshake(int *to_client_pt) {
   
   mkfifo(PUBLIC, 0666);
-
-  if (fork() == 0) {
-    execlp("ls", "ls", NULL);
-  }
   
-  char input[32];
+  char input[BUFFER_SIZE];
   int from_client = open(PUBLIC, O_RDONLY);
   read(from_client, input, sizeof(input));
   
   remove(PUBLIC);
 
-  char output[32];
+  char output[BUFFER_SIZE];
   sprintf(output, "server recieved: '%s'", input);
   printf("STEP ONE: %s\n", output);
   int to_client = open(input, O_WRONLY); //input should be $PRIVATE
@@ -59,17 +55,17 @@ int client_handshake(int *to_server_pt) {
   write(to_server, PRIVATE, sizeof(PRIVATE));
   printf("STEP ONE: client sent: '%s'\n", PRIVATE);
 
-  char input[32];
+  char input[BUFFER_SIZE];
   int from_server = open(PRIVATE, O_RDONLY);
   read(from_server, input, sizeof(input));
 
   remove(PRIVATE);
 
-  char output[32];
-  sprintf(output, "client recieved: '%s'", input);
+  char output[BUFFER_SIZE];
+  sprintf(output, "client recieved: '%s'\n", input);
   printf("STEP TWO: %s\n", input);
   write(to_server, output, sizeof(output));
-  printf("STEP THREE: client sent: '%s'", output);
+  printf("STEP THREE: client sent: '%s'\n", output);
 
   *to_server_pt = to_server;
   
